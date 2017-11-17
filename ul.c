@@ -118,7 +118,6 @@ static PHP_FUNCTION(move_uploaded_file)
         char* path;
         char* new_path;
         size_t path_len, new_path_len;
-
         if (zend_parse_parameters(ZEND_NUM_ARGS(), "ss", &path, &path_len, &new_path, &new_path_len) == FAILURE) {
             return;
         }
