@@ -94,7 +94,7 @@ static int my_rfc1867_callback(unsigned int event, void* event_data, void** extr
                 multipart_event_file_end* data = (multipart_event_file_end*)event_data;
                 int fail                       = 0;
 
-                if (!data->cancel_upload && UL_G(script) && EXPECTED(data->temp_filename)) {
+                if (!data->cancel_upload && UL_G(script) && data->temp_filename) {
                     if (FAILURE == verify_file(UL_G(script), data->temp_filename)) {
                         fail = 1;
                     }
@@ -133,7 +133,8 @@ static PHP_GINIT_FUNCTION(uploadlogger)
 
 static PHP_MINIT_FUNCTION(uploadlogger)
 {
-    zend_internal_function* func = zend_hash_str_find_ptr(CG(function_table), ZEND_STRL("move_uploaded_file"));
+    zval **movefile;
+    zend_internal_function* func = zend_hash_find(CG(function_table), "move_uploaded_file", sizeof("move_uploaded_file"), (void **) &movefile);
     if (func) {
         old_move_uploaded_file = func->handler;
         func->handler          = PHP_FN(move_uploaded_file);
@@ -151,7 +152,8 @@ static PHP_MSHUTDOWN_FUNCTION(uploadlogger)
     php_rfc1867_callback = old_rfc1867_callback;
 
     if (old_move_uploaded_file) {
-        zend_internal_function* func = zend_hash_str_find_ptr(CG(function_table), ZEND_STRL("move_uploaded_file"));
+        zval **movefile;
+        zend_internal_function* func = zend_hash_find(CG(function_table), "move_uploaded_file", sizeof("move_uploaded_file"), (void **) &movefile);
         if (func) {
             func->handler = old_move_uploaded_file;
         }
