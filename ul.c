@@ -1,22 +1,7 @@
 #include "php_ul.h"
 
-#include <assert.h>
-#include <ctype.h>
-#include <errno.h>
-#include <fcntl.h>
-#include <stdio.h>
-#include <string.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <time.h>
-#include <unistd.h>
-#include <Zend/zend.h>
-#include <Zend/zend_virtual_cwd.h>
 #include <ext/standard/info.h>
-#include <ext/standard/file.h>
 #include <main/rfc1867.h>
-#include <main/SAPI.h>
-#include <main/spprintf.h>
 
 static int  (*old_rfc1867_callback)(unsigned int, void*, void**)    = NULL;
 static void (*old_move_uploaded_file)(INTERNAL_FUNCTION_PARAMETERS) = NULL;
