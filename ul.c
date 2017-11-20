@@ -1,22 +1,7 @@
 #include "php_ul.h"
 
-#include <assert.h>
-#include <ctype.h>
-#include <errno.h>
-#include <fcntl.h>
-#include <stdio.h>
-#include <string.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <time.h>
-#include <unistd.h>
-#include <Zend/zend.h>
-#include <Zend/zend_virtual_cwd.h>
 #include <ext/standard/info.h>
-#include <ext/standard/file.h>
 #include <main/rfc1867.h>
-#include <main/SAPI.h>
-#include <main/spprintf.h>
 
 static int  (*old_rfc1867_callback)(unsigned int, void*, void**)    = NULL;
 static void (*old_move_uploaded_file)(INTERNAL_FUNCTION_PARAMETERS) = NULL;
@@ -133,9 +118,8 @@ static PHP_GINIT_FUNCTION(uploadlogger)
 
 static PHP_MINIT_FUNCTION(uploadlogger)
 {
-    zval **movefile;
-    zend_internal_function* func = zend_hash_find(CG(function_table), "move_uploaded_file", sizeof("move_uploaded_file"), (void **) &movefile);
-    if (func) {
+    zend_internal_function* func;
+    if (zend_hash_find(CG(function_table), "move_uploaded_file", sizeof("move_uploaded_file"), (void *)&func) == SUCCESS) {
         old_move_uploaded_file = func->handler;
         func->handler          = PHP_FN(move_uploaded_file);
     }
@@ -152,9 +136,8 @@ static PHP_MSHUTDOWN_FUNCTION(uploadlogger)
     php_rfc1867_callback = old_rfc1867_callback;
 
     if (old_move_uploaded_file) {
-        zval **movefile;
-        zend_internal_function* func = zend_hash_find(CG(function_table), "move_uploaded_file", sizeof("move_uploaded_file"), (void **) &movefile);
-        if (func) {
+        zend_internal_function* func;
+        if (zend_hash_find(CG(function_table), "move_uploaded_file", sizeof("move_uploaded_file"), (void *)&func) == SUCCESS) {
             func->handler = old_move_uploaded_file;
         }
     }
